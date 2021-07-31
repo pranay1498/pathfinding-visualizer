@@ -1,0 +1,58 @@
+.node {
+  width: 3vh;
+  height: 3vh;
+  min-width: auto;
+  min-height: auto;
+  border: 0.001px solid rgb(108, 209, 240);
+}
+.grid {
+  display: grid;
+  grid-template-rows: repeat(20, 1fr);
+  grid-template-columns: repeat(1, 1fr);
+  height: auto;
+  width: auto;
+  /* max-height: 200vh;
+  max-width: 200vh; */
+  margin: 2%;
+}
+.grid > div {
+  display: flex;
+  flex-direction: row;
+  width: auto;
+}
+.node-start {
+  background-color: green;
+}
+.node-finish {
+  background-color: red;
+}
+
+.isVisited {
+  background-color: blue;
+}
+
+.node-Wall {
+  background-color: grey;
+}
+
+.isPath {
+  background-color: yellow;
+}
+
+button {
+  font-size: medium;
+  font-weight: 400;
+  color: rgb(255, 255, 255);
+  margin: 3%;
+  padding: 0.5%;
+  background-color: rgb(26, 112, 182);
+  border: 0;
+  border-radius: 4px;
+  align-self: center;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.2, 1.2);
+  cursor: pointer;
+}
