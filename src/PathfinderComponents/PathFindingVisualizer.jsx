@@ -1,6 +1,6 @@
 import React from "react";
 import Node from "./Node";
-import dijkstra from "../algorithms/dijkstra";
+import Header from "./Header";
 
 const START_NODE_ROW = 9;
 const START_NODE_COL = 20;
@@ -27,7 +27,7 @@ class PathFindingVisualizer extends React.Component {
     });
   }
 
-  async visualiseDijsktra() {
+  visualiseAlgorithm(algorithm) {
     if (this.state.isWorking === true) return;
     this.setState({
       isWorking: true,
@@ -41,19 +41,23 @@ class PathFindingVisualizer extends React.Component {
     });
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
-    const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-    this.animateDijkstra(visitedNodesInOrder, startNode, finishNode);
+    //get nodes in the order they are visited by running appropriate algorithm
+    const visitedNodesInOrder = algorithm(grid, startNode, finishNode);
+    this.animateAlgorithm(visitedNodesInOrder, startNode, finishNode);
   }
 
   animateShortestPath(visitedNodesInOrder, startNode, finishNode) {
     let path = [];
     let currNode = visitedNodesInOrder[visitedNodesInOrder.length - 1];
+    //make the final path using the previous node information
     while (currNode !== startNode) {
       path.push(currNode);
       currNode = currNode.previousNode;
     }
     path = path.reverse();
+
     for (let ind = 0; ind < path.length; ind++) {
+      //path will be animated at last of animation, so is an algortihm working will be set to false after this
       if (ind === path.length - 1) {
         setTimeout(() => {
           this.setState({
@@ -72,19 +76,32 @@ class PathFindingVisualizer extends React.Component {
       }, 25 * ind);
     }
   }
-  animateDijkstra(visitedNodesInOrder, startNode, finishNode) {
+
+  //animate dijkstra on board using the visitedNodes array
+  animateAlgorithm(visitedNodesInOrder, startNode, finishNode) {
     for (let ind = 1; ind < visitedNodesInOrder.length; ind++) {
       if (ind === visitedNodesInOrder.length - 1) {
-        setTimeout(
-          () =>
-            this.animateShortestPath(
-              visitedNodesInOrder,
-              startNode,
-              finishNode
-            ),
-          20 * ind
-        );
-        return;
+        //if last node is the finish node then display path
+        if (visitedNodesInOrder[ind] === finishNode) {
+          setTimeout(
+            () =>
+              this.animateShortestPath(
+                visitedNodesInOrder,
+                startNode,
+                finishNode
+              ),
+            20 * ind
+          );
+          return;
+        } //if not the finish node then do not display path
+        else {
+          setTimeout(() => {
+            this.setState({
+              isWorking: false,
+            });
+          }, 20 * ind);
+          return;
+        }
       }
       //setstate with delay
       setTimeout(() => {
@@ -110,6 +127,7 @@ class PathFindingVisualizer extends React.Component {
     }
   }
 
+  //mouse events for adding walls
   handleMouseDown(row, col) {
     const grid = getGridWithWallToggled(this.state.grid, row, col);
     this.setState({
@@ -130,6 +148,8 @@ class PathFindingVisualizer extends React.Component {
       isMousePressed: false,
     });
   }
+
+  //clear everything on board
   clearBoard() {
     if (this.state.isWorking === true) return;
     const initialGrid = getInitialGrid();
@@ -137,15 +157,15 @@ class PathFindingVisualizer extends React.Component {
       grid: initialGrid,
     });
   }
+
   render() {
     const { grid } = this.state;
     return (
       <div>
-        <button onClick={() => this.visualiseDijsktra()}>
-          Visualise Dijkstra
-        </button>
-        <button onClick={() => this.clearBoard()}>Clear Board</button>
-        <p>Click and slowly drag on grid to add walls!!</p>
+        <Header
+          onClear={() => this.clearBoard()}
+          selectedAlgorithm={(algorithm) => this.visualiseAlgorithm(algorithm)}
+        ></Header>
         <div className="grid">
           {grid.map((row, rowidx) => {
             return (
@@ -178,6 +198,7 @@ class PathFindingVisualizer extends React.Component {
   }
 }
 
+//get initial empty grid
 function getInitialGrid() {
   const grid = [];
   for (let i = 0; i < 20; i++) {
@@ -190,6 +211,7 @@ function getInitialGrid() {
   return grid;
 }
 
+//create a default node
 function createNode(row, col) {
   return {
     row,
@@ -204,6 +226,7 @@ function createNode(row, col) {
   };
 }
 
+//get grid with wall added
 function getGridWithWallToggled(grid, row, col) {
   const newgrid = grid;
   const node = newgrid[row][col];

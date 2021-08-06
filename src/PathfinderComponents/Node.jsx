@@ -35,6 +35,7 @@ class Node extends React.Component {
         onMouseDown={() => onMouseDown(row, col)}
         onMouseUp={() => onMouseUp()}
         onMouseEnter={() => onMouseEnter(row, col)}
+        draggable="false"
       ></div>
     );
   }
